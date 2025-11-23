@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
-const CELL_SIZE = 40; // px
+const CELL_SIZE = 30; // px
 
 const MazeGrid = ({ levelId, mazeData, optimalPathData, onFinish, onStep }) => {
     const [grid, setGrid] = useState([]);
@@ -13,17 +13,11 @@ const MazeGrid = ({ levelId, mazeData, optimalPathData, onFinish, onStep }) => {
     useEffect(() => {
         if (!mazeData) return;
 
-        console.log("🔍 MazeData recibido:", mazeData);
-        console.log("🔍 Tipo de mazeData:", typeof mazeData);
-        console.log("🔍 Primer nodo (0):", mazeData[0]);
-        console.log("🔍 Segundo nodo (1):", mazeData[1]);
-
         // Calculate dimensions from the maze data
         const totalNodes = Object.keys(mazeData).length;
         const cols = Math.sqrt(totalNodes);
         const rows = cols;
 
-        console.log("🔍 Dimensiones calculadas:", { rows, cols, totalNodes });
         setDimensions({ rows, cols });
 
         const newGrid = [];
@@ -32,11 +26,6 @@ const MazeGrid = ({ levelId, mazeData, optimalPathData, onFinish, onStep }) => {
             for (let c = 0; c < cols; c++) {
                 const nodeId = r * cols + c;
                 const neighbors = mazeData[nodeId] || []; // Array of neighbor IDs
-
-                // Debug first cell
-                if (nodeId === 0) {
-                    console.log("🔍 Nodo 0 vecinos:", neighbors);
-                }
 
                 // Determine walls based on neighbors
                 // If neighbor is NOT in list, there is a wall

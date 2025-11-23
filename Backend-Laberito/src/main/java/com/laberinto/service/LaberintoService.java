@@ -42,28 +42,28 @@ public class LaberintoService {
 
         switch (nivel) {
             case 1:
-                filas = 6;
-                columnas = 6;
-                break;
-            case 2:
-                filas = 8;
-                columnas = 8;
-                break;
-            case 3:
-                filas = 10;
-                columnas = 10;
-                break;
-            case 4:
                 filas = 12;
                 columnas = 12;
                 break;
-            case 5:
+            case 2:
                 filas = 15;
                 columnas = 15;
                 break;
+            case 3:
+                filas = 18;
+                columnas = 18;
+                break;
+            case 4:
+                filas = 22;
+                columnas = 22;
+                break;
+            case 5:
+                filas = 25;
+                columnas = 25;
+                break;
             default:
-                filas = 6;
-                columnas = 6;
+                filas = 12;
+                columnas = 12;
                 break;
         }
 
