@@ -7,38 +7,43 @@ const MazeGrid = ({ levelId, mazeData, optimalPathData, onFinish, onStep }) => {
     const [grid, setGrid] = useState([]);
     const [playerPos, setPlayerPos] = useState({ r: 0, c: 0 });
     const [showPath, setShowPath] = useState(false);
-
-    // Level config to determine dimensions
-    const getLevelConfig = (id) => {
-        switch (parseInt(id)) {
-            case 1: return { rows: 6, cols: 6 };
-            case 2: return { rows: 8, cols: 8 };
-            case 3: return { rows: 10, cols: 10 };
-            case 4: return { rows: 12, cols: 12 };
-            case 5: return { rows: 15, cols: 15 };
-            default: return { rows: 6, cols: 6 };
-        }
-    };
-
-    const config = getLevelConfig(levelId);
+    const [dimensions, setDimensions] = useState({ rows: 0, cols: 0 });
 
     // Transform graf_json (Adjacency List) to Grid with Walls
     useEffect(() => {
         if (!mazeData) return;
 
+        console.log("🔍 MazeData recibido:", mazeData);
+        console.log("🔍 Tipo de mazeData:", typeof mazeData);
+        console.log("🔍 Primer nodo (0):", mazeData[0]);
+        console.log("🔍 Segundo nodo (1):", mazeData[1]);
+
+        // Calculate dimensions from the maze data
+        const totalNodes = Object.keys(mazeData).length;
+        const cols = Math.sqrt(totalNodes);
+        const rows = cols;
+
+        console.log("🔍 Dimensiones calculadas:", { rows, cols, totalNodes });
+        setDimensions({ rows, cols });
+
         const newGrid = [];
-        for (let r = 0; r < config.rows; r++) {
+        for (let r = 0; r < rows; r++) {
             const row = [];
-            for (let c = 0; c < config.cols; c++) {
-                const nodeId = r * config.cols + c;
+            for (let c = 0; c < cols; c++) {
+                const nodeId = r * cols + c;
                 const neighbors = mazeData[nodeId] || []; // Array of neighbor IDs
+
+                // Debug first cell
+                if (nodeId === 0) {
+                    console.log("🔍 Nodo 0 vecinos:", neighbors);
+                }
 
                 // Determine walls based on neighbors
                 // If neighbor is NOT in list, there is a wall
-                const topNeighbor = (r - 1) * config.cols + c;
-                const bottomNeighbor = (r + 1) * config.cols + c;
-                const leftNeighbor = r * config.cols + (c - 1);
-                const rightNeighbor = r * config.cols + (c + 1);
+                const topNeighbor = (r - 1) * cols + c;
+                const bottomNeighbor = (r + 1) * cols + c;
+                const leftNeighbor = r * cols + (c - 1);
+                const rightNeighbor = r * cols + (c + 1);
 
                 row.push({
                     r, c,
@@ -55,7 +60,7 @@ const MazeGrid = ({ levelId, mazeData, optimalPathData, onFinish, onStep }) => {
         }
         setGrid(newGrid);
         setPlayerPos({ r: 0, c: 0 });
-    }, [mazeData, config.rows, config.cols]);
+    }, [mazeData]);
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -77,11 +82,11 @@ const MazeGrid = ({ levelId, mazeData, optimalPathData, onFinish, onStep }) => {
 
             if (nextPos) {
                 setPlayerPos(nextPos);
-                const nextNodeId = nextPos.r * config.cols + nextPos.c;
+                const nextNodeId = nextPos.r * dimensions.cols + nextPos.c;
                 onStep(nextNodeId); // Send node ID to parent
 
                 // Check win
-                if (nextPos.r === config.rows - 1 && nextPos.c === config.cols - 1) {
+                if (nextPos.r === dimensions.rows - 1 && nextPos.c === dimensions.cols - 1) {
                     onFinish();
                 }
             }
@@ -89,14 +94,14 @@ const MazeGrid = ({ levelId, mazeData, optimalPathData, onFinish, onStep }) => {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [playerPos, grid, config]);
+    }, [playerPos, grid, dimensions]);
 
     if (grid.length === 0) return <div>Cargando Laberinto...</div>;
 
     // Helper to check if a cell is in the optimal path
     const isInOptimalPath = (r, c) => {
         if (!optimalPathData) return false;
-        const nodeId = r * config.cols + c;
+        const nodeId = r * dimensions.cols + c;
         return optimalPathData.includes(nodeId);
     };
 
@@ -105,7 +110,7 @@ const MazeGrid = ({ levelId, mazeData, optimalPathData, onFinish, onStep }) => {
             <div
                 style={{
                     display: 'grid',
-                    gridTemplateColumns: `repeat(${config.cols}, ${CELL_SIZE}px)`,
+                    gridTemplateColumns: `repeat(${dimensions.cols}, ${CELL_SIZE}px)`,
                     gap: 0,
                     border: '2px solid var(--text-secondary)',
                     position: 'relative',
@@ -131,7 +136,7 @@ const MazeGrid = ({ levelId, mazeData, optimalPathData, onFinish, onStep }) => {
                             {/* Start Marker */}
                             {r === 0 && c === 0 && <div style={{ position: 'absolute', inset: 0, background: 'rgba(34, 197, 94, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: 'var(--success)' }}>INICIO</div>}
                             {/* End Marker */}
-                            {r === config.rows - 1 && c === config.cols - 1 && <div style={{ position: 'absolute', inset: 0, background: 'rgba(239, 68, 68, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: 'var(--danger)' }}>FIN</div>}
+                            {r === dimensions.rows - 1 && c === dimensions.cols - 1 && <div style={{ position: 'absolute', inset: 0, background: 'rgba(239, 68, 68, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: 'var(--danger)' }}>FIN</div>}
 
                             {/* Optimal Path Visualization */}
                             {showPath && isInOptimalPath(r, c) && (
