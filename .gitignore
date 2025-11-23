@@ -1,0 +1,11 @@
+node_modules/
+target/
+dist/
+.vscode/
+.idea/
+*.class
+*.log
+*.jar
+*.war
+.DS_Store
+apache-maven-*/
