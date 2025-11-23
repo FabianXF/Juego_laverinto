@@ -220,6 +220,21 @@ mysql -V         # MySQL 8.0 o superior
 
 ### 1. Configurar Base de Datos
 
+**Opción A: Usar el script SQL incluido (Recomendado)**
+
+```bash
+# Ejecutar el script SQL
+mysql -u root -p < database.sql
+
+# O desde MySQL Workbench:
+# 1. Abrir MySQL Workbench
+# 2. File > Open SQL Script
+# 3. Seleccionar database.sql
+# 4. Ejecutar (⚡ icono de rayo)
+```
+
+**Opción B: Crear manualmente**
+
 ```sql
 -- Crear base de datos
 CREATE DATABASE laberinto_db;
@@ -229,6 +244,8 @@ CREATE USER 'laberinto_user'@'localhost' IDENTIFIED BY 'password123';
 GRANT ALL PRIVILEGES ON laberinto_db.* TO 'laberinto_user'@'localhost';
 FLUSH PRIVILEGES;
 ```
+
+> **Nota**: El archivo `database.sql` en la raíz del proyecto contiene el esquema completo de la base de datos con todas las tablas, índices y un usuario administrador de prueba.
 
 ### 2. Configurar Backend
 
