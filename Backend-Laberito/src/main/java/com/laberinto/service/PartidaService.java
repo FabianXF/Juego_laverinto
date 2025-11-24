@@ -41,6 +41,9 @@ public class PartidaService {
     @Autowired
     private LaberintoRepository laberintoRepository;
 
+    @Autowired
+    private RankingService rankingService;
+
     @Transactional
     public Partida crearPartida(Long usuarioId, int nivel) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
@@ -118,6 +121,18 @@ public class PartidaService {
         if (usuario.getNivelActual() == partida.getNivel()) {
             usuario.setNivelActual(usuario.getNivelActual() + 1);
             usuarioRepository.save(usuario);
+        }
+
+        // Registrar en ranking (con try-catch para no romper la finalización)
+        try {
+            rankingService.registrarTiempo(
+                    usuario.getId(),
+                    partida.getNivel(),
+                    (int) segundos,
+                    pasosJugador,
+                    puntuacionFinal);
+        } catch (Exception e) {
+            System.err.println("Error al registrar en ranking: " + e.getMessage());
         }
 
         return partidaRepository.save(partida);

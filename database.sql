@@ -97,6 +97,49 @@ CREATE TABLE movimientos (
 );
 
 -- ============================================
+-- TABLA DE RANKING
+-- ============================================
+-- Almacena TODOS los tiempos de cada jugador por nivel
+-- Permite múltiples registros del mismo usuario en el mismo nivel
+CREATE TABLE IF NOT EXISTS ranking (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  usuario_id BIGINT NOT NULL,
+  nivel INT NOT NULL,
+  mejor_tiempo INT NOT NULL COMMENT 'Tiempo en segundos',
+  pasos_usados INT NOT NULL COMMENT 'Número de pasos',
+  puntuacion INT NOT NULL COMMENT 'Puntuación obtenida',
+  fecha_logro DATETIME DEFAULT NOW() COMMENT 'Fecha del intento',
+  
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+  
+  -- Índices para consultas rápidas
+  INDEX idx_ranking_nivel (nivel),
+  INDEX idx_ranking_usuario (usuario_id),
+  INDEX idx_ranking_tiempo (mejor_tiempo)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- TABLA DE RECOMPENSAS
+-- ============================================
+-- Almacena los logros y recompensas obtenidas por los jugadores
+CREATE TABLE IF NOT EXISTS recompensas (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  usuario_id BIGINT NOT NULL,
+  tipo VARCHAR(50) NOT NULL COMMENT 'Tipo: gold_medal, silver_medal, bronze_medal, speed_master, perfect_run',
+  nivel INT NOT NULL COMMENT 'Nivel donde se obtuvo la recompensa',
+  descripcion VARCHAR(255) COMMENT 'Descripción del logro',
+  fecha_obtencion DATETIME DEFAULT NOW(),
+  
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+  
+  -- Índices
+  INDEX idx_usuario (usuario_id),
+  INDEX idx_tipo (tipo),
+  INDEX idx_nivel (nivel),
+  INDEX idx_fecha (fecha_obtencion)
+);
+
+-- ============================================
 -- DATOS INICIALES (OPCIONAL)
 -- ============================================
 -- Crear un usuario administrador de prueba
@@ -113,6 +156,10 @@ CREATE INDEX idx_laberintos_partida ON laberintos(partida_id);
 CREATE INDEX idx_nodos_laberinto ON nodos(laberinto_id);
 CREATE INDEX idx_aristas_laberinto ON aristas(laberinto_id);
 CREATE INDEX idx_movimientos_partida ON movimientos(partida_id);
+
+-- Índices específicos para ranking
+CREATE INDEX idx_ranking_nivel_tiempo ON ranking(nivel, mejor_tiempo ASC);
+CREATE INDEX idx_ranking_nivel_puntuacion ON ranking(nivel, puntuacion DESC);
 
 -- ============================================
 -- VERIFICACIÓN

@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import LevelSelect from './pages/LevelSelect';
 import Game from './pages/Game';
+import Ranking from './pages/Ranking';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -36,6 +37,14 @@ function App() {
                             element={
                                 <ProtectedRoute>
                                     <Game />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/ranking/:nivel"
+                            element={
+                                <ProtectedRoute>
+                                    <Ranking />
                                 </ProtectedRoute>
                             }
                         />

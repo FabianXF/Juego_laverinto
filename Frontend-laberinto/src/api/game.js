@@ -1,45 +1,53 @@
 import client from './client';
 
-export const createPartidaRequest = async (nivel) => {
-    // Get user ID from storage (saved during login)
-    const userStr = localStorage.getItem('user');
-    let usuarioId = null;
-    if (userStr) {
-        const userObj = JSON.parse(userStr);
-        usuarioId = userObj.id;
-    }
+// Crear nueva partida
+export const createPartidaRequest = (nivel) => 
+    client.post('/partidas', { usuarioId: JSON.parse(localStorage.getItem('user')).id, nivel })
+        .then(res => res.data);
 
-    // Construct payload matching Backend expectation: { usuarioId: Long, nivel: int }
-    const payload = {
-        usuarioId: Number(usuarioId),
-        nivel: Number(nivel)
-    };
+// Obtener partida por ID
+export const getPartidaRequest = (id) => 
+    client.get(`/partidas/${id}`)
+        .then(res => res.data);
 
-    const response = await client.post('/partidas', payload);
-    return response.data;
-};
+// Obtener grafo del laberinto
+export const getGrafoRequest = (partidaId) => 
+    client.get(`/partidas/${partidaId}/laberinto`)
+        .then(res => res.data);
 
-export const getPartidaRequest = async (id) => {
-    const response = await client.get(`/partidas/${id}`);
-    return response.data;
-};
+// Registrar movimiento
+export const sendMovementRequest = (partidaId, nodoId) => 
+    client.post(`/partidas/${partidaId}/movimiento`, { nodoId })
+        .then(res => res.data);
 
-export const getGrafoRequest = async (id) => {
-    const response = await client.get(`/partidas/${id}/graf`);
-    return response.data;
-};
+// Finalizar partida
+export const finalizePartidaRequest = (partidaId) => 
+    client.post(`/partidas/${partidaId}/finalizar`)
+        .then(res => res.data);
 
-export const sendMovementRequest = async (partidaId, nodoId) => {
-    const response = await client.post(`/partidas/${partidaId}/movimiento`, { nodoId });
-    return response.data;
-};
+// Obtener ruta óptima
+export const getOptimalPathRequest = (partidaId) => 
+    client.get(`/partidas/${partidaId}/ruta-optima`)
+        .then(res => res.data);
 
-export const finalizePartidaRequest = async (partidaId) => {
-    const response = await client.post(`/partidas/${partidaId}/finalizar`);
-    return response.data;
-};
+// ========== NUEVAS FUNCIONES PARA RANKING Y RECOMPENSAS ==========
 
-export const getOptimalPathRequest = async (partidaId) => {
-    const response = await client.get(`/partidas/${partidaId}/ruta-optima`);
-    return response.data;
-};
+// Obtener ranking por nivel
+export const getRankingByLevelRequest = (nivelId, limit = 10) => 
+    client.get(`/ranking/nivel/${nivelId}?limit=${limit}`)
+        .then(res => res.data);
+
+// Obtener posición del usuario en un nivel
+export const getUserPositionRequest = (usuarioId, nivelId) => 
+    client.get(`/ranking/posicion/${usuarioId}/${nivelId}`)
+        .then(res => res.data);
+
+// Obtener todos los rankings del usuario
+export const getUserRankingsRequest = (usuarioId) => 
+    client.get(`/ranking/usuario/${usuarioId}`)
+        .then(res => res.data);
+
+// Obtener recompensas del usuario
+export const getUserRewardsRequest = (usuarioId) => 
+    client.get(`/ranking/recompensas/${usuarioId}`)
+        .then(res => res.data);

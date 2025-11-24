@@ -34,9 +34,14 @@ const LevelSelect = () => {
                             {isLocked ? (
                                 <button className="btn-secondary" disabled style={{ width: '100%', cursor: 'not-allowed' }}>Bloqueado</button>
                             ) : (
-                                <Link to={`/game/${level.id}`} className="btn-primary" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
-                                    Jugar
-                                </Link>
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <Link to={`/game/${level.id}`} className="btn-primary" style={{ flex: 1, textAlign: 'center', textDecoration: 'none' }}>
+                                        Jugar
+                                    </Link>
+                                    <Link to={`/ranking/${level.id}`} className="btn-secondary" style={{ textAlign: 'center', textDecoration: 'none', padding: '10px 15px' }}>
+                                        🏆
+                                    </Link>
+                                </div>
                             )}
                         </div>
                     );

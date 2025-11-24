@@ -32,6 +32,8 @@ Un juego educativo que demuestra conceptos de **Matemáticas Discretas** y **Teo
 - ✅ Ver la ruta óptima calculada con BFS (Breadth-First Search)
 - ✅ Competir por el mejor puntaje basado en tiempo y pasos
 - ✅ Progresar a través de 5 niveles incrementales
+- ✅ **Ver ranking de mejores tiempos por nivel (Top 5)**
+- ✅ **Obtener recompensas visuales por logros**
 
 El juego es una demostración práctica de cómo los **grafos** y los **algoritmos de búsqueda** se aplican en problemas del mundo real.
 
@@ -489,6 +491,69 @@ private int calcularPuntuacion(Partida partida, int pasosOptimos) {
     // Puntuación base - penalizaciones
     return Math.max(0, 1000 - penalizacionPasos - penalizacionTiempo);
 }
+```
+
+---
+
+## 🏆 Sistema de Ranking y Recompensas
+
+### Ranking de Jugadores
+
+El juego incluye un sistema de **ranking por nivel** que registra todos los intentos de los jugadores:
+
+**Características:**
+- ✅ **Top 5 mejores tiempos** por cada nivel
+- ✅ Permite **múltiples registros** del mismo jugador
+- ✅ Ordenamiento por **mejor tiempo** (menor a mayor)
+- ✅ Muestra: posición, jugador, tiempo, pasos y puntuación
+- ✅ Resalta al jugador actual en la tabla
+- ✅ Medallas visuales para top 3 (🥇🥈🥉)
+
+**Acceso al Ranking:**
+- Botón 🏆 en el selector de niveles
+- Botón "Ver Ranking" al finalizar una partida
+
+### Sistema de Recompensas
+
+Los jugadores reciben **recompensas visuales animadas** basadas en su desempeño:
+
+| Recompensa | Criterio | Descripción |
+|------------|----------|-------------|
+| 🥇 **Medalla de Oro** | Tiempo ≤ óptimo Y pasos ≤ óptimos | Ejecución perfecta |
+| 🥈 **Medalla de Plata** | Tiempo ≤ 120% del óptimo | Muy buen tiempo |
+| 🥉 **Medalla de Bronce** | Tiempo ≤ 150% del óptimo | Buen tiempo |
+| ⚡ **Maestro de Velocidad** | Pasos < óptimos | Ruta más eficiente |
+| ✨ **Ejecución Perfecta** | Pasos = óptimos | Ruta exacta |
+
+**Animación de Recompensas:**
+- Aparece automáticamente al finalizar la partida
+- Efectos visuales con partículas (Framer Motion)
+- Iconos animados (Lucide React)
+- Descripción del logro obtenido
+
+### Implementación Técnica
+
+**Backend:**
+```java
+// RankingService.java - Registra TODOS los intentos
+public Ranking registrarTiempo(Long usuarioId, Integer nivel, 
+                               Integer tiempo, Integer pasos, Integer puntuacion) {
+    Usuario usuario = usuarioRepository.findById(usuarioId)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    
+    // Crear nuevo registro (no actualizar)
+    Ranking nuevoRanking = new Ranking(usuario, nivel, tiempo, pasos, puntuacion);
+    return rankingRepository.save(nuevoRanking);
+}
+```
+
+**Frontend:**
+```javascript
+// Ranking.jsx - Muestra Top 5
+const loadRanking = async () => {
+    const rankingData = await getRankingByLevelRequest(parseInt(nivel), 5);
+    setRankings(rankingData);
+};
 ```
 
 ---

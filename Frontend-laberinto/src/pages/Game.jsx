@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MazeGrid from '../components/MazeGrid';
+import RewardAnimation from '../components/RewardAnimation';
 import { useAuth } from '../context/AuthContext';
 import { createPartidaRequest, getOptimalPathRequest, finalizePartidaRequest, sendMovementRequest, getGrafoRequest } from '../api/game';
 import { Clock, Footprints } from 'lucide-react';
@@ -19,6 +20,11 @@ const Game = () => {
     const [isFinished, setIsFinished] = useState(false);
     const [score, setScore] = useState(0);
     const [optimalStepsCount, setOptimalStepsCount] = useState(0);
+
+    // Estado para recompensas
+    const [showReward, setShowReward] = useState(false);
+    const [rewardType, setRewardType] = useState(null);
+    const [rewardDescription, setRewardDescription] = useState('');
 
     // Prevent double init
     const initialized = useRef(false);
@@ -101,11 +107,23 @@ const Game = () => {
 
         try {
             const result = await finalizePartidaRequest(partidaId);
-            // Result should contain score calculated by backend
-            setScore(result.puntuacion || 0);
+
+            // El backend ahora retorna un objeto con partida y reward info
+            const partida = result.partida || result;
+            setScore(partida.puntuacion || 0);
 
             // Update user level if passed
             updateLevel(parseInt(id) + 1);
+
+            // Mostrar recompensa si la hay
+            if (result.reward && result.rewardType) {
+                // Esperar un momento antes de mostrar la recompensa
+                setTimeout(() => {
+                    setRewardType(result.rewardType);
+                    setRewardDescription(result.rewardDescription || '¡Recompensa obtenida!');
+                    setShowReward(true);
+                }, 1000);
+            }
         } catch (error) {
             console.error("Error finalizing:", error);
             // Fallback local score calculation if backend fails
@@ -174,10 +192,21 @@ const Game = () => {
                         <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
                             <button onClick={() => navigate('/levels')} className="btn-secondary">Volver</button>
                             <button onClick={handleRetry} className="btn-primary">Reintentar</button>
+                            <button onClick={() => navigate(`/ranking/${id}`)} className="btn-secondary" style={{ background: 'linear-gradient(135deg, #FFD700, #FFA500)' }}>
+                                🏆 Ver Ranking
+                            </button>
                         </div>
                     </div>
                 </div>
             )}
+
+            {/* Animación de recompensa */}
+            <RewardAnimation
+                show={showReward}
+                rewardType={rewardType}
+                description={rewardDescription}
+                onClose={() => setShowReward(false)}
+            />
         </div>
     );
 };
